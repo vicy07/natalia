@@ -54,27 +54,48 @@ Start the FastAPI server:
 uvicorn main:app --reload
 ```
 
-Then open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for interactive API documentation.
+Once running, open the interactive **Swagger UI** at
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to explore and try the API endpoints.
+You can also view the alternative ReDoc documentation at
+[http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc).
 
-#### Example API endpoints:
-- `/natal_chart/calc` — Calculate chart data (JSON)
-- `/natal_chart/image` — Get natal chart as PNG image
+#### Available endpoints and example calls
 
-For natal chart endpoints you can specify either a `place` string or
-`latitude` and `longitude` coordinates. At least one option must be provided.
+All endpoints accept either a human‑readable `place` or explicit `latitude` and `longitude` coordinates.
 
-Example requests:
+- **Natal chart** – snapshot of the heavens at birth showing the core personality blueprint  
+  `GET /natal_chart/calc`  
+  `GET /natal_chart/image`
+  ```bash
+  curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&place=Millerovo,%20Rostov%20Oblast,%20Russia&tz_offset=3" --output chart.png
+  ```
 
-```bash
-# using a place
-curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&place=Millerovo,%20Rostov%20Oblast,%20Russia&tz_offset=3" --output chart.png
+- **Synastry** – compares two natal charts to evaluate relationship dynamics  
+  `GET /synastry`  
+  `GET /synastry/analytics`  
+  `GET /synastry/image`
+  ```bash
+  curl "http://127.0.0.1:8000/synastry?date1=1990-05-17&time1=14:30&place1=Riga&tz_offset1=3&date2=1992-08-05&time2=09:15&place2=Berlin&tz_offset2=1"
+  ```
 
-# using coordinates
-curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&latitude=48.9256&longitude=40.3997&tz_offset=3" --output chart.png
+- **Transits** – shows current planetary movements against the natal chart for forecasting  
+  `GET /transits`
+  ```bash
+  curl "http://127.0.0.1:8000/transits?natal_date=1994-01-15&natal_time=17:45&natal_place=Millerovo&natal_tz_offset=3&transit_date=2024-06-01"
+  ```
 
-# place with explicit coordinates (coordinates take precedence)
-curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&place=Millerovo&latitude=48.9256&longitude=40.3997&tz_offset=3" --output chart.png
-```
+- **Horary chart** – casts a chart for the moment a question is asked to glean guidance  
+  `GET /horary_chart`
+  ```bash
+  curl "http://127.0.0.1:8000/horary_chart?date=2024-05-01&time=12:00&place=Riga&tz_offset=3"
+  ```
+
+- **Weekly forecast** – seven‑day personal outlook derived from natal data and daily transits  
+  `GET /weekly_forecast`
+  ```bash
+  curl "http://127.0.0.1:8000/weekly_forecast?date=1994-01-15&time=17:45&place=Millerovo&tz_offset=3&start_date=2024-06-01"
+  ```
+
 
 ---
 

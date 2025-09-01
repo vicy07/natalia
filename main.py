@@ -43,67 +43,151 @@ def natal_chart_image_endpoint(
 def synastry_endpoint(
     date1: str = Query(..., description="Birth date of person 1 (YYYY-MM-DD)"),
     time1: str = Query(..., description="Birth time of person 1 (HH:MM)"),
-    place1: str = Query(..., description="Birth place of person 1 (city, country)"),
+    place1: Optional[str] = Query(None, description="Birth place of person 1 (city, country)"),
     tz_offset1: int = Query(..., description="Time zone offset for person 1 (e.g., 2 for UTC+2)"),
     date2: str = Query(..., description="Birth date of person 2 (YYYY-MM-DD)"),
     time2: str = Query(..., description="Birth time of person 2 (HH:MM)"),
-    place2: str = Query(..., description="Birth place of person 2 (city, country)"),
-    tz_offset2: int = Query(..., description="Time zone offset for person 2 (e.g., 2 for UTC+2)")
+    place2: Optional[str] = Query(None, description="Birth place of person 2 (city, country)"),
+    tz_offset2: int = Query(..., description="Time zone offset for person 2 (e.g., 2 for UTC+2)"),
+    latitude1: Optional[float] = Query(None, description="Latitude of person 1"),
+    longitude1: Optional[float] = Query(None, description="Longitude of person 1"),
+    latitude2: Optional[float] = Query(None, description="Latitude of person 2"),
+    longitude2: Optional[float] = Query(None, description="Longitude of person 2"),
 ):
-    return synastry(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2)
+    if not place1 and (latitude1 is None or longitude1 is None):
+        return JSONResponse({"error": "Place or coordinates for person 1 must be provided"}, status_code=400)
+    if not place2 and (latitude2 is None or longitude2 is None):
+        return JSONResponse({"error": "Place or coordinates for person 2 must be provided"}, status_code=400)
+    return synastry(
+        date1,
+        time1,
+        place1,
+        tz_offset1,
+        date2,
+        time2,
+        place2,
+        tz_offset2,
+        latitude1,
+        longitude1,
+        latitude2,
+        longitude2,
+    )
 
 @app.get("/synastry/analytics")
 def synastry_analytics_endpoint(
     date1: str = Query(..., description="Birth date of person 1 (YYYY-MM-DD)"),
     time1: str = Query(..., description="Birth time of person 1 (HH:MM)"),
-    place1: str = Query(..., description="Birth place of person 1 (city, country)"),
+    place1: Optional[str] = Query(None, description="Birth place of person 1 (city, country)"),
     tz_offset1: int = Query(..., description="Time zone offset for person 1 (e.g., 2 for UTC+2)"),
     date2: str = Query(..., description="Birth date of person 2 (YYYY-MM-DD)"),
     time2: str = Query(..., description="Birth time of person 2 (HH:MM)"),
-    place2: str = Query(..., description="Birth place of person 2 (city, country)"),
-    tz_offset2: int = Query(..., description="Time zone offset for person 2 (e.g., 2 for UTC+2)")
+    place2: Optional[str] = Query(None, description="Birth place of person 2 (city, country)"),
+    tz_offset2: int = Query(..., description="Time zone offset for person 2 (e.g., 2 for UTC+2)"),
+    latitude1: Optional[float] = Query(None, description="Latitude of person 1"),
+    longitude1: Optional[float] = Query(None, description="Longitude of person 1"),
+    latitude2: Optional[float] = Query(None, description="Latitude of person 2"),
+    longitude2: Optional[float] = Query(None, description="Longitude of person 2"),
 ):
-    return synastry_analytics(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2)
+    if not place1 and (latitude1 is None or longitude1 is None):
+        return JSONResponse({"error": "Place or coordinates for person 1 must be provided"}, status_code=400)
+    if not place2 and (latitude2 is None or longitude2 is None):
+        return JSONResponse({"error": "Place or coordinates for person 2 must be provided"}, status_code=400)
+    return synastry_analytics(
+        date1,
+        time1,
+        place1,
+        tz_offset1,
+        date2,
+        time2,
+        place2,
+        tz_offset2,
+        latitude1,
+        longitude1,
+        latitude2,
+        longitude2,
+    )
 
 @app.get("/synastry/image")
 def synastry_image_endpoint(
     date1: str = Query(..., description="Birth date of person 1 (YYYY-MM-DD)"),
     time1: str = Query(..., description="Birth time of person 1 (HH:MM)"),
-    place1: str = Query(..., description="Birth place of person 1 (city, country)"),
+    place1: Optional[str] = Query(None, description="Birth place of person 1 (city, country)"),
     tz_offset1: int = Query(..., description="Time zone offset for person 1 (e.g., 2 for UTC+2)"),
     date2: str = Query(..., description="Birth date of person 2 (YYYY-MM-DD)"),
     time2: str = Query(..., description="Birth time of person 2 (HH:MM)"),
-    place2: str = Query(..., description="Birth place of person 2 (city, country)"),
-    tz_offset2: int = Query(..., description="Time zone offset for person 2 (e.g., 2 for UTC+2)")
+    place2: Optional[str] = Query(None, description="Birth place of person 2 (city, country)"),
+    tz_offset2: int = Query(..., description="Time zone offset for person 2 (e.g., 2 for UTC+2)"),
+    latitude1: Optional[float] = Query(None, description="Latitude of person 1"),
+    longitude1: Optional[float] = Query(None, description="Longitude of person 1"),
+    latitude2: Optional[float] = Query(None, description="Latitude of person 2"),
+    longitude2: Optional[float] = Query(None, description="Longitude of person 2"),
 ):
-    return synastry_image(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2)
+    if not place1 and (latitude1 is None or longitude1 is None):
+        return JSONResponse({"error": "Place or coordinates for person 1 must be provided"}, status_code=400)
+    if not place2 and (latitude2 is None or longitude2 is None):
+        return JSONResponse({"error": "Place or coordinates for person 2 must be provided"}, status_code=400)
+    return synastry_image(
+        date1,
+        time1,
+        place1,
+        tz_offset1,
+        date2,
+        time2,
+        place2,
+        tz_offset2,
+        latitude1,
+        longitude1,
+        latitude2,
+        longitude2,
+    )
 
 @app.get("/horary_chart")
 def horary_chart_endpoint(
     date: str = Query(..., description="Date of the question (YYYY-MM-DD)"),
     time: str = Query(..., description="Time of the question (HH:MM)"),
-    place: str = Query(..., description="Place where the question was asked (city, country)"),
-    tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 3 for Moscow)")
+    place: Optional[str] = Query(None, description="Place where the question was asked (city, country)"),
+    tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 3 for Moscow)"),
+    latitude: Optional[float] = Query(None, description="Latitude in decimal degrees"),
+    longitude: Optional[float] = Query(None, description="Longitude in decimal degrees"),
 ):
-    return horary_chart(date, time, place, tz_offset)
+    if not place and (latitude is None or longitude is None):
+        return JSONResponse({"error": "Place or coordinates must be provided"}, status_code=400)
+    return horary_chart(date, time, place, tz_offset, latitude, longitude)
 
 @app.get("/transits")
 def transits_endpoint(
     natal_date: str = Query(..., description="Birth date (YYYY-MM-DD)"),
     natal_time: str = Query(..., description="Birth time (HH:MM)"),
-    natal_place: str = Query(..., description="Birth place (city, country)"),
+    natal_place: Optional[str] = Query(None, description="Birth place (city, country)"),
     natal_tz_offset: int = Query(..., description="Time zone offset for birth (e.g., 3 for Moscow)"),
     transit_date: str = Query(..., description="Date for transit (YYYY-MM-DD)"),
-    transit_time: str = Query("00:00", description="Time for transit (HH:MM), default 00:00")
+    transit_time: str = Query("00:00", description="Time for transit (HH:MM), default 00:00"),
+    latitude: Optional[float] = Query(None, description="Latitude in decimal degrees"),
+    longitude: Optional[float] = Query(None, description="Longitude in decimal degrees"),
 ):
-    return transits(natal_date, natal_time, natal_place, natal_tz_offset, transit_date, transit_time)
+    if not natal_place and (latitude is None or longitude is None):
+        return JSONResponse({"error": "Place or coordinates must be provided"}, status_code=400)
+    return transits(
+        natal_date,
+        natal_time,
+        natal_place,
+        natal_tz_offset,
+        transit_date,
+        transit_time,
+        latitude,
+        longitude,
+    )
 
 @app.get("/weekly_forecast")
 def weekly_forecast_endpoint(
     date: str = Query(..., description="Birth date in format YYYY-MM-DD"),
     time: str = Query(..., description="Birth time in format HH:MM"),
-    place: str = Query(..., description="Place of birth (city, country)"),
+    place: Optional[str] = Query(None, description="Place of birth (city, country)"),
     tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 2 for UTC+2)"),
-    start_date: str = Query(..., description="Start date for forecast in format YYYY-MM-DD")
+    start_date: str = Query(..., description="Start date for forecast in format YYYY-MM-DD"),
+    latitude: Optional[float] = Query(None, description="Latitude in decimal degrees"),
+    longitude: Optional[float] = Query(None, description="Longitude in decimal degrees"),
 ):
-    return weekly_forecast(date, time, place, tz_offset, start_date)
+    if not place and (latitude is None or longitude is None):
+        return JSONResponse({"error": "Place or coordinates must be provided"}, status_code=400)
+    return weekly_forecast(date, time, place, tz_offset, start_date, latitude, longitude)

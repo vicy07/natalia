@@ -1,11 +1,21 @@
 # logic_transit.py
 from astro_core import calculate_chart
+from typing import Optional
 
-def transits(natal_date, natal_time, natal_place, natal_tz_offset, transit_date, transit_time="00:00"):
-    natal, err = calculate_chart(natal_date, natal_time, natal_place, natal_tz_offset)
+def transits(
+    natal_date,
+    natal_time,
+    natal_place: Optional[str],
+    natal_tz_offset,
+    transit_date,
+    transit_time="00:00",
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+):
+    natal, err = calculate_chart(natal_date, natal_time, natal_place, natal_tz_offset, latitude, longitude)
     if err:
         return err
-    trans, err2 = calculate_chart(transit_date, transit_time, natal_place, natal_tz_offset)
+    trans, err2 = calculate_chart(transit_date, transit_time, natal_place, natal_tz_offset, latitude, longitude)
     if err2:
         return err2
     orb_luminaries = 8

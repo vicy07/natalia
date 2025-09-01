@@ -4,10 +4,24 @@ from astro_core import calculate_chart
 import matplotlib.pyplot as plt
 import numpy as np
 import io
+from typing import Optional
 
-def synastry(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2):
-    chart1, err1 = calculate_chart(date1, time1, place1, tz_offset1)
-    chart2, err2 = calculate_chart(date2, time2, place2, tz_offset2)
+def synastry(
+    date1,
+    time1,
+    place1,
+    tz_offset1,
+    date2,
+    time2,
+    place2,
+    tz_offset2,
+    latitude1: Optional[float] = None,
+    longitude1: Optional[float] = None,
+    latitude2: Optional[float] = None,
+    longitude2: Optional[float] = None,
+):
+    chart1, err1 = calculate_chart(date1, time1, place1, tz_offset1, latitude1, longitude1)
+    chart2, err2 = calculate_chart(date2, time2, place2, tz_offset2, latitude2, longitude2)
     if err1:
         return err1
     if err2:
@@ -52,9 +66,22 @@ def synastry(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2)
         "summary": summary
     }
 
-def synastry_analytics(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2):
-    chart1, err1 = calculate_chart(date1, time1, place1, tz_offset1)
-    chart2, err2 = calculate_chart(date2, time2, place2, tz_offset2)
+def synastry_analytics(
+    date1,
+    time1,
+    place1,
+    tz_offset1,
+    date2,
+    time2,
+    place2,
+    tz_offset2,
+    latitude1: Optional[float] = None,
+    longitude1: Optional[float] = None,
+    latitude2: Optional[float] = None,
+    longitude2: Optional[float] = None,
+):
+    chart1, err1 = calculate_chart(date1, time1, place1, tz_offset1, latitude1, longitude1)
+    chart2, err2 = calculate_chart(date2, time2, place2, tz_offset2, latitude2, longitude2)
     if err1:
         return err1
     if err2:
@@ -111,9 +138,22 @@ def synastry_analytics(date1, time1, place1, tz_offset1, date2, time2, place2, t
         "total_aspects": len(synastry_aspects)
     }
 
-def synastry_image(date1, time1, place1, tz_offset1, date2, time2, place2, tz_offset2):
-    chart1, err1 = calculate_chart(date1, time1, place1, tz_offset1)
-    chart2, err2 = calculate_chart(date2, time2, place2, tz_offset2)
+def synastry_image(
+    date1,
+    time1,
+    place1,
+    tz_offset1,
+    date2,
+    time2,
+    place2,
+    tz_offset2,
+    latitude1: Optional[float] = None,
+    longitude1: Optional[float] = None,
+    latitude2: Optional[float] = None,
+    longitude2: Optional[float] = None,
+):
+    chart1, err1 = calculate_chart(date1, time1, place1, tz_offset1, latitude1, longitude1)
+    chart2, err2 = calculate_chart(date2, time2, place2, tz_offset2, latitude2, longitude2)
     if err1:
         return err1
     if err2:
