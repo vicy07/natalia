@@ -59,6 +59,26 @@ class TestNatalAPI(unittest.TestCase):
 
     @patch('astro_core.Nominatim')
     @patch('astro_core.swe')
+    def test_calculate_chart_with_coordinates(self, mock_swe, mock_nominatim):
+        mock_swe.julday.return_value = 2450000.5
+        def fake_calc_ut(jd, code):
+            idx = int(code) % 10
+            return [[idx*36.0, 0, 0, -1.0 if idx % 2 == 0 else 1.0]]
+        mock_swe.calc_ut.side_effect = fake_calc_ut
+        mock_swe.houses.return_value = ([10.0]*12, None)
+        data, err = calculate_chart('2000-01-01', '12:00', None, 3, latitude=55.75, longitude=37.62)
+        self.assertIsNone(err)
+        mock_nominatim.return_value.geocode.assert_not_called()
+        self.assertIn('planet_degrees', data)
+
+    def test_calculate_chart_no_location(self):
+        data, err = calculate_chart('2000-01-01', '12:00', None, 3)
+        self.assertIsNone(data)
+        self.assertIsNotNone(err)
+        self.assertIn('error', err)
+
+    @patch('astro_core.Nominatim')
+    @patch('astro_core.swe')
     def test_draw_chart_produces_image_file(self, mock_swe, mock_nominatim):
         mock_geo = MagicMock()
         mock_geo.latitude = 55.75

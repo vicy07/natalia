@@ -60,6 +60,22 @@ Then open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for interacti
 - `/natal_chart/calc` — Calculate chart data (JSON)
 - `/natal_chart/image` — Get natal chart as PNG image
 
+For natal chart endpoints you can specify either a `place` string or
+`latitude` and `longitude` coordinates. At least one option must be provided.
+
+Example requests:
+
+```bash
+# using a place
+curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&place=Millerovo,%20Rostov%20Oblast,%20Russia&tz_offset=3" --output chart.png
+
+# using coordinates
+curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&latitude=48.9256&longitude=40.3997&tz_offset=3" --output chart.png
+
+# place with explicit coordinates (coordinates take precedence)
+curl "http://127.0.0.1:8000/natal_chart/image?date=1994-01-15&time=17:45&place=Millerovo&latitude=48.9256&longitude=40.3997&tz_offset=3" --output chart.png
+```
+
 ---
 
 ## 🧪 Running Unit Tests

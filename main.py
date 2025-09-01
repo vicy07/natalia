@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Query, Response
 from fastapi.responses import JSONResponse
+from typing import Optional
 from logic_natal import natal_chart_calc, natal_chart_image
 from logic_synastry import synastry, synastry_analytics, synastry_image
 from logic_transit import transits
@@ -16,19 +17,27 @@ app = FastAPI()
 def natal_chart_calc_endpoint(
     date: str = Query(..., description="Birth date in format YYYY-MM-DD"),
     time: str = Query(..., description="Birth time in format HH:MM"),
-    place: str = Query(..., description="Place of birth (city, country)"),
-    tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 2 for UTC+2)")
+    place: Optional[str] = Query(None, description="Place of birth (city, country)"),
+    tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 2 for UTC+2)"),
+    latitude: Optional[float] = Query(None, description="Latitude in decimal degrees"),
+    longitude: Optional[float] = Query(None, description="Longitude in decimal degrees"),
 ):
-    return natal_chart_calc(date, time, place, tz_offset)
+    if not place and (latitude is None or longitude is None):
+        return JSONResponse({"error": "Place or coordinates must be provided"}, status_code=400)
+    return natal_chart_calc(date, time, place, tz_offset, latitude, longitude)
 
 @app.get("/natal_chart/image")
 def natal_chart_image_endpoint(
     date: str = Query(..., description="Birth date in format YYYY-MM-DD"),
     time: str = Query(..., description="Birth time in format HH:MM"),
-    place: str = Query(..., description="Place of birth (city, country)"),
-    tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 2 for UTC+2)")
+    place: Optional[str] = Query(None, description="Place of birth (city, country)"),
+    tz_offset: int = Query(..., description="Time zone offset from UTC (e.g., 2 for UTC+2)"),
+    latitude: Optional[float] = Query(None, description="Latitude in decimal degrees"),
+    longitude: Optional[float] = Query(None, description="Longitude in decimal degrees"),
 ):
-    return natal_chart_image(date, time, place, tz_offset)
+    if not place and (latitude is None or longitude is None):
+        return JSONResponse({"error": "Place or coordinates must be provided"}, status_code=400)
+    return natal_chart_image(date, time, place, tz_offset, latitude, longitude)
 
 @app.get("/synastry")
 def synastry_endpoint(

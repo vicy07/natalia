@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import swisseph as swe
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderServiceError
+from typing import Optional
 
 planet_names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars',
                 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
@@ -21,21 +22,31 @@ OFFLINE_COORDS = {
     "Moscow": (55.75, 37.62),
     "London": (51.5, -0.12),
 }
-
-
-def calculate_chart(date: str, time: str, place: str, tz_offset: int):
-    if place in OFFLINE_COORDS:
-        # Avoid unnecessary network requests during testing by using
-        # predefined coordinates for common cities.
-        lat, lon = OFFLINE_COORDS[place]
+def calculate_chart(
+    date: str,
+    time: str,
+    place: Optional[str],
+    tz_offset: int,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+):
+    if latitude is not None and longitude is not None:
+        lat, lon = latitude, longitude
+    elif place:
+        if place in OFFLINE_COORDS:
+            # Avoid unnecessary network requests during testing by using
+            # predefined coordinates for common cities.
+            lat, lon = OFFLINE_COORDS[place]
+        else:
+            try:
+                geo = Nominatim(user_agent="astro_api").geocode(place)
+            except GeocoderServiceError:
+                geo = None
+            if not geo:
+                return None, {"error": "Invalid place name"}
+            lat, lon = geo.latitude, geo.longitude
     else:
-        try:
-            geo = Nominatim(user_agent="astro_api").geocode(place)
-        except GeocoderServiceError:
-            geo = None
-        if not geo:
-            return None, {"error": "Invalid place name"}
-        lat, lon = geo.latitude, geo.longitude
+        return None, {"error": "Place or coordinates must be provided"}
     local = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
     utc_time = local - timedelta(hours=tz_offset)
     jd = swe.julday(utc_time.year, utc_time.month, utc_time.day,
@@ -75,10 +86,18 @@ def calculate_chart(date: str, time: str, place: str, tz_offset: int):
         ruler = sign_rulers[sign_index]
         ruler_pos = planet_degrees.get(ruler)
         house_rulers.append({
-            "house": i+1,
-            "sign": sign_index+1,
+            "house": i + 1,
+            "sign": sign_index + 1,
             "ruler": ruler,
-            "ruler_degree": ruler_pos
+            "ruler_degree": ruler_pos,
         })
-    return {"jd": jd, "lat": lat, "lon": lon,
-            "planet_degrees": planet_degrees, "houses": houses, "aspects": aspects, "retrograde_planets": retrograde_planets, "house_rulers": house_rulers}, None
+    return {
+        "jd": jd,
+        "lat": lat,
+        "lon": lon,
+        "planet_degrees": planet_degrees,
+        "houses": houses,
+        "aspects": aspects,
+        "retrograde_planets": retrograde_planets,
+        "house_rulers": house_rulers,
+    }, None
