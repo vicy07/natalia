@@ -2,6 +2,7 @@
 import swisseph as swe
 from astro_core import calculate_chart
 from datetime import datetime
+from typing import Optional
 
 def get_week_transits(natal, start_jd: float, days: int = 7):
     planet_names = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars',
@@ -45,8 +46,16 @@ def get_week_transits(natal, start_jd: float, days: int = 7):
         week.append({"jd":round(jd,5),"transits":trans,"aspects":aspects,"houses":houses})
     return week
 
-def weekly_forecast(date, time, place, tz_offset, start_date):
-    natal, err = calculate_chart(date, time, place, tz_offset)
+def weekly_forecast(
+    date,
+    time,
+    place: Optional[str],
+    tz_offset,
+    start_date,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+):
+    natal, err = calculate_chart(date, time, place, tz_offset, latitude, longitude)
     if err:
         return err
     sd = datetime.strptime(start_date, "%Y-%m-%d")
