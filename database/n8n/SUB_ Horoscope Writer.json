@@ -1,0 +1,303 @@
+{
+  "name": "SUB: Horoscope Writer",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "telegram_chat_id",
+              "type": "number"
+            },
+            {
+              "name": "forecats_type"
+            },
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1216,
+        -496
+      ],
+      "id": "b9c75ca9-a3d7-4da1-902f-e5096258b2ba",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -752,
+        -48
+      ],
+      "id": "69d6803f-bd7e-4c3f-b72a-3e089fa07636",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "J9QCgRLr4jXooPhw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1FskfNCn4p9CkZ",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ"
+        },
+        "filterByFormula": "={user id}={{ $json.telegram_chat_id }}",
+        "returnAll": false,
+        "options": {
+          "view": {
+            "__rl": true,
+            "value": "viw4IcgVmuuUxum5s",
+            "mode": "list",
+            "cachedResultName": "All Data",
+            "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ/viw4IcgVmuuUxum5s"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -992,
+        -240
+      ],
+      "id": "cd147b6a-26a0-44e4-952a-877ad09d6d41",
+      "name": "GetUserData",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to calculate weekly forecast",
+        "url": "https://natal-production.up.railway.app/weekly_forecast",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={ \"date\": \"{{ $fromAI('date', '', 'string') }}\", \"time\": \"{{ $fromAI('time', '', 'string') }}\", \"tz_offset\": \"{{ $fromAI('tz_offset', '', 'string') }}\", \"latitude\": \"{{ $fromAI('latitude', '', 'string') }}\", \"longitude\": \"{{ $fromAI('longitude', '', 'string') }}\", \"start_date\": \"{{ $fromAI('start_date', '', 'string') }}\"} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -128,
+        -80
+      ],
+      "id": "98158bd9-fc60-4ab0-b1eb-6da44feffddd",
+      "name": "HTTP Weekly Forecast"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to build Horary Chart answer to simple question with yes/no in moment and place.\n    date - Date of the question (YYYY-MM-DD)\n    time - Time of the question (HH:MM)\n    place - Place where the question was asked (city, country)\n    tz_offset - Time zone offset from UTC (e.g., 3 for Moscow)\"\n",
+        "url": "https://natal-production.up.railway.app/horary_chart",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={ \"date\": \"{{ $fromAI('date', '', 'string') }}\", \"time\": \"{{ $fromAI('time', '', 'string') }}\", \"tz_offset\": \"{{ $fromAI('tz_offset', '', 'string') }}\", \"latitude\": \"{{ $fromAI('latitude', '', 'string') }}\", \"longitude\": \"{{ $fromAI('longitude', '', 'string') }}\", \"start_date\": \"{{ $fromAI('start_date', '', 'string') }}\"} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        -64
+      ],
+      "id": "1b92026b-69de-4cf9-be25-962c2eeaa0a2",
+      "name": "HTTP Horary Chart"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to build synastry compatibility for two persons.\n    date1 - Date of main person birth (YYYY-MM-DD)\n    time1 - Time of main person birth (HH:MM)\n    place1 - Place where main person birth (city, country)\n    tz_offset1 - Time zone offset from UTC (e.g., 3 for Moscow)\"\n    date2 - Date of main person birth (YYYY-MM-DD)\n    time2 - Time of main person birth (HH:MM)\n    place2 - Place where main person birth (city, country)\n    tz_offset2 - Time zone offset from UTC (e.g., 3 for Moscow)\"",
+        "url": "https://natal-production.up.railway.app/synastry",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={ \"date1\": \"{{ $fromAI('date', '', 'string') }}\", \"time1\": \"{{ $fromAI('time', '', 'string') }}\", \"tz_offset1\": \"{{ $fromAI('tz_offset', '', 'string') }}\", \"latitude1\": \"{{ $fromAI('latitude', '', 'string') }}\", \"longitude1\": \"{{ $fromAI('longitude', '', 'string') }}\", \"date2\": \"{{ $fromAI('date2', '', 'string') }}\", \"time2\": \"{{ $fromAI('time2', '', 'string') }}\", \"tz_offset2\": \"{{ $fromAI('tz_offset2', '', 'string') }}\", \"latitude2\": \"{{ $fromAI('latitude2', '', 'string') }}\", \"longitude2\": \"{{ $fromAI('longitude2', '', 'string') }}\"} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        -64
+      ],
+      "id": "7dc319e8-202c-4cc6-b4b4-04b28a40fe58",
+      "name": "HTTP Synastry"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Сегодня: {{ new Date().toLocaleDateString(\"ru-RU\", { day: 'numeric', month: 'long', year: 'numeric' }) }}\nИнтересует  {{ $('When Executed by Another Workflow').item.json.forecats_type }}\nСообщение пользователя: {{ $('When Executed by Another Workflow').item.json.message}} \n\n          Мой знак зодиака: {{ $json.zodiac }}\nДата,время и место рождения: {{ $json.birth_datetime_place }}\n        Информация обо мне: {{ $json.user_summary }}",
+        "options": {
+          "systemMessage": "Ты — профессиональный астролог. Твоя задача — на основе натальной карты пользователя и текущих транзитов составить персональный астрологический прогноз. Формат вывода должен быть коротким, структурированным и пригодным для отправки через Telegram-бота.\n\nАлгоритм действия:\n- Для общего прогноза принимаешь знак зодиака или дату роджения,и тип прогноза который мы хотим получить.\n- Если не хватает данных или произошла ошибка при вызове внешних инструментов - так и скажи, но не придумывай прогноз.\n- месторождение пересчитываешь в GPS координаты: latitude и longitude \n- Вызываешь инструменты и передаешь параметры, не гадая а пересчитывая из этой информации о месте, дате и времени рождения: {{ $json[\"Birth DateTimePlace\"] }}\n\nquery parameters: \n   - date - дата рождения в формате %Y-%m-%d \n   - time - время рождения в формате %H:%M\n   - latitude - GPS latitude посчитанное от места рождения\n   - longitude - GPS longitude посчитанное от места рождения\n   - tz_offset - integers часовой offset посчитай разницу в часах от гринвича в момент рождения в местоположение по GPS координатам\n\nИнструменты:\n- Для недельного прогноза вызываешь специализированный call \"HTTP Weekly Forecast\"; start_date - дата понедельника текущей недели в формате %Y-%m-%d\n  Example: { \"date\": \"1978-03-28\", \"time\": \"23:50\", \"tz_offset\": \"3\", \"latitude\": \"56.5045\", \"longitude\": \"26.5023\", \"start_date\": \"2025-09-22\"};   \n- Для ответа на вопрос да/нет используй call \"HTTP Horary Chart\". Переспросси о в каком месте принимется решение и на какую дату и передай её в параметр \"start_date\" \n  Example: { \"date\": \"1978-03-28\", \"time\": \"23:50\", \"tz_offset\": \"3\", \"latitude\": \"56.5045\", \"longitude\": \"26.5023\", \"start_date\": \"2025-09-22\"};   \n- Для ответа на вопрос о совместимости людей человека call \"HTTP Synastry\". Переспроси информацию о втором человеке, если этой информации нет в сообщении пользователя. Помести зачения в date2, time2, latitude2, longitude2, tz_offset2 - посчитанные званения по тем же принципам как для основного человека. Example: { \"date1\": \"1978-03-28\", \"time1\": \"23:50\", \"tz_offset1\": \"3\", \"latitude1\": \"56.5045\", \"longitude1\": \"26.5023\", \"date2\": \"1978-09-04\", \"time2\": \"19:42\", \"tz_offset2\": \"3\", \"latitude2\": \"56.946\", \"longitude2\": \"24.1052\"} \n  \n\nВ прогноз должны быть включены следующие разделы, но учитывай пожелания и ожидания пользователя\n🎯 1. Общий фокус недели\nОпредели, в какой натальный дом попадает транзитное Солнце. Укажи основную тему недели и сферу жизни, где будет сосредоточено внимание.\n\n🌙 2. Луна по дням \nНа каждый день недели (с Пн по Вс), если недельный гороскоп и только одно значение луны на день, если гороскоп на день - укажи знак зодиака, в котором находится Луна, и соответствующий эмоциональный фон. Используй компактные формулировки (1 строка на день). \n\n🔄 3. Основные аспекты недели (транзит → натал)\nОпредели аспекты между транзитными и натальными планетами с орбисом до 6°.\nДля каждого:\n\nукажи символ аспектов (☌ — соединение, △ — трин, □ — квадрат, ✶ — секстиль, ☍ — оппозиция),\n\nоцени влияние (позитивное/напряжённое),\n\nсформулируй краткий эффект.\n\n🪐 4. Медленные планеты\nУкажи, какие транзиты от Юпитера, Сатурна, Урана, Нептуна, Плутона воздействуют на натальные планеты.\nОпиши, какие долгосрочные трансформации и изменения это может вызывать.\n\n🏠 5. Акцентированные дома\nНа основе транзитных планет (особенно Солнце, Марс, Юпитер) и системы домов пользователя, перечисли активные дома недели и сферы, которые будут затронуты.\n\n📤 Формат вывода: (Telegram-friendly)\ntext\nКопировать\nРедактировать\n\"📅 Ваш астропрогноз на неделю (9-июня-2025)\n\n🔆 Общий фокус:\nСолнце в 6 доме → неделя заботы о здоровье и рабочих задачах.\n\n🌙 Луна:\nПн–Вт: ♋ Рак — домашние дела, комфорт  \nСр–Чт: ♍ Дева — внимание к деталям  \nПт–Вс: ♎ Весы — партнёрства, баланс  \n\n💫 Аспекты:\n✅ Луна △ Марс — эмоциональная активность  \n❤️ Меркурий ☌ Венера — любовь и гармония  \n⚠️ Меркурий □ Марс — остерегайтесь конфликтов  \n💰 Венера ✶ Юпитер — шанс на доход и удовольствия  \n🌀 Нептун ✶ Плутон — глубинные перемены\n\n🏠 Акцентированные дома:\n6 дом — работа, здоровье  \n7 дом — отношения и партнёрства\n\n📝 Совет:\n- До среды — начинать важные дела  \n- Пятница — идеальна для встреч и эстетики\n🧩 Примечания:\nИспользуй краткие формулировки, избегай перегруженности.\n\nЕсли аспектов слишком много — выбери 3–5 наиболее значимых.\n\nЕсли натальные данные неполные (например, неизвестен Асцендент), пропусти анализ домов.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        -480
+      ],
+      "id": "db5ecb0f-8368-449e-82e2-42726cc0f15c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.telegram_chat_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -496
+      ],
+      "id": "3b3ed0a4-57e8-4f25-88aa-4a3f19f49d37",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "telegram_chat_id": 1119822310,
+          "forecats_type": "natal",
+          "message": "Детальная интерпретация натальной карты"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetUserData": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Weekly Forecast": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Horary Chart": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Synastry": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "83a7e2db-b284-4607-9e09-14688bccb592",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4af5e9ebbe5297a00876edb3cd77d4f4f46fc27bdc8aed3a953e8df9a3e5db33"
+  },
+  "id": "nufe3JjWmaXa8lcG",
+  "tags": [
+    {
+      "updatedAt": "2025-04-30T20:37:24.352Z",
+      "createdAt": "2025-04-30T20:37:24.352Z",
+      "id": "uJw9hpY4KUg7tdMW",
+      "name": "StartUp"
+    }
+  ]
+}

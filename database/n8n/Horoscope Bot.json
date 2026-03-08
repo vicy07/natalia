@@ -1,0 +1,2915 @@
+{
+  "name": "Horoscope Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2736,
+        -144
+      ],
+      "id": "e0d01371-97fd-4628-9721-a54d0f466514",
+      "name": "Telegram Trigger",
+      "webhookId": "b0b3bdf4-d233-435b-b07e-60be0fa38809",
+      "credentials": {
+        "telegramApi": {
+          "id": "5aNan4djBXr83S4p",
+          "name": "Telegram: Horoscope Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3456,
+        112
+      ],
+      "id": "44e16e2d-59d3-4053-abce-b6a39d4702fc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "J9QCgRLr4jXooPhw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $json.chat_id || $node[\"Set\"].json.chat_id }},\n  \"text\": {{ JSON.stringify(\n    String($json.output ?? '')\n      .replace(/\\\\/g, '\\\\\\\\')                 // экранируем обратный слэш\n      .replace(/([*`_\\[\\]\\(\\)])/g, '\\\\$1')    // экранируем *, `, _, [, ], (, )\n      .replace(/\\r?\\n/g, '\\n')                // нормализуем переводы строк\n  ) }},\n  \"parse_mode\": \"Markdown\",\n  \"disable_web_page_preview\": true\n  {{ $json.reply_markup ? `, \"reply_markup\": ${JSON.stringify($json.reply_markup)}` : \"\" }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5616,
+        -416
+      ],
+      "id": "e2b3849d-8777-4d65-bc8f-c26ffd189bff",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c0411c8-a0e1-4252-9942-13cf0e2de774",
+              "name": "chat_id",
+              "value": "={{ $json?.message?.from?.id}}",
+              "type": "string"
+            },
+            {
+              "id": "01352242-ddf6-41f1-a38d-3e2e3b538831",
+              "name": "user_message",
+              "value": "={{ $json?.message?.text}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        -576
+      ],
+      "id": "6f3cc834-9ac1-40cb-a420-253e07b92a2e",
+      "name": "Set"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8308552f-5b6b-4714-9115-571f1a943c16",
+                    "leftValue": "={{ $('Set').item.json.user_message }}",
+                    "rightValue": "/me",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Profile"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8c2e3867-9dfb-4a86-a246-67d0d6fcc8dc",
+                    "leftValue": "={{ $('Set').item.json.user_message }}",
+                    "rightValue": "/forecast",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Forecast"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8d7bf9db-322c-4840-8679-ec72920bcfe2",
+                    "leftValue": "={{ $('Set').item.json.user_message }}",
+                    "rightValue": "/invite",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Invite"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "807b1645-ee74-4a8f-99ca-8422810f93a2",
+                    "leftValue": "={{ $('Set').item.json.user_message }}",
+                    "rightValue": "/synastry_accepted",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "synastry_accepted"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6c0d6e85-36bb-4912-a199-2396457ef28d",
+                    "leftValue": "={{ $('Set').item.json.user_message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ANY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3552,
+        -672
+      ],
+      "id": "23ecf27e-bb64-4d94-8627-7f195bab50a2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62459d95-e0aa-4cbf-a8cb-2ffec979c2a1",
+              "name": "reply_markup",
+              "value": "={\n  \"inline_keyboard\": [\n    [\n      {\n        \"text\": \"🔹 Basic {{ $('GetUserData').item.json.Level === 'Basic' ? ' ✅' : '' }}\",\n        \"callback_data\": \"subscription:Basic\"\n      },\n      {\n        \"text\": \"🔸 Pro {{ $('GetUserData').item.json.Level === 'Pro' ? ' ✅' : '' }}\",\n        \"callback_data\": \"subscription:Pro\"\n      }\n    ]\n  ]\n}",
+              "type": "string"
+            },
+            {
+              "id": "042b1ec2-9355-4a12-83bc-d4d569edd4a7",
+              "name": "output",
+              "value": "=📦 *Your current subscription level*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4352,
+        -1344
+      ],
+      "id": "8efda42a-9f73-44f0-95fa-c6b1f7f2b51f",
+      "name": "Set Inline Buttons: Subscription"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6fd0de5d-d1aa-451e-9c3e-e5c96bce973e",
+              "leftValue": "={{$json[\"callback_query\"]}}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1824,
+        -112
+      ],
+      "id": "ea3fd01d-170b-4c61-bd1d-0ae78c100d35",
+      "name": "If Message"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "15f4acce-c893-4333-8d56-7ac863db278a",
+                    "leftValue": "={{ ($json.callback_query?.data ?? '').slice(0,8).toLowerCase()}}",
+                    "rightValue": "forecast",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "forecast"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8a9e8c43-84ae-4662-85dd-37d6624640c0",
+                    "leftValue": "={{ ($json.callback_query?.data ?? '').slice(0,8).toLowerCase() }}",
+                    "rightValue": "synestry",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "synestry"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9321f78b-9f68-43ad-8a25-306fbd43ac78",
+                    "leftValue": "={{ ($json.callback_query?.data ?? '').slice(0,6).toLowerCase() }}",
+                    "rightValue": "invite",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invite"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.callback_query?.data ?? '').slice(0,12).toLowerCase() }}",
+                    "rightValue": "subscription",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3ea70e72-5030-4822-b3cd-cae246d74807"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Subscription Level"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "da2f14b8-8973-41d5-ae6d-14f16ba2415d",
+                    "leftValue": "={{ ($json.callback_query?.data ?? '').slice(0,4).toLowerCase()}}",
+                    "rightValue": "send",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send Frequency"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1600,
+        800
+      ],
+      "id": "c4b23283-414f-417e-a109-fe92e6ec132a",
+      "name": "Process Command"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o/answerCallbackQuery",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"callback_query_id\": \"{{ $('Telegram Trigger').item.json.callback_query.id }}\",\n  \"text\": \"Succesfully Changed!\",\n  \"show_alert\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2832,
+        640
+      ],
+      "id": "e83b7a02-c7b5-483f-b982-79ae39a11b45",
+      "name": "HTTP Response to Query Comment"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\":  {{ $json.user_id }} ,\n  \"text\": \"*✅ Profile updated succesfully !*\\n\\n*Subscription Level:* {{ $json.level }}\\n*Message Frequency:* {{ $json.frequency }}\",\n  \"parse_mode\": \"Markdown\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        1040
+      ],
+      "id": "5668db87-46e3-4ed0-92d2-5de21735b1ca",
+      "name": "HTTP Send Confirmation details"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62459d95-e0aa-4cbf-a8cb-2ffec979c2a1",
+              "name": "reply_markup",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "56935b13-56ba-40d6-9bd0-fae3333e2521",
+              "name": "output",
+              "value": "=📋 *Вся информация о вас ({{ $json.user_name }}):*\n\n• *Знак зодиака:* {{ $json.zodiac }}\n• *Рождение:* {{ $json.birth_datetime_place }}\n• *Уровень подписки:* {{ $json.level }}\n• *Частота рассылки:* {{ $json.frequency }}\n• *Профиль:* {{ $json.user_summary }}\n• *Язык общения:* {{ $json.language }}\n• *Натальная карта:* {{$json.natal && Object.keys($json.natal).length > 0 ? \"есть\" : \"нет\"}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3840,
+        -1488
+      ],
+      "id": "8f422727-831b-4805-bd5b-473647bf2933",
+      "name": "Send Profile Info"
+    },
+    {
+      "parameters": {
+        "description": "Makes an HTTP request and returns the response data with calculated natal chart in text format.\nAdditionally send picture of Natal Chart to telegram",
+        "workflowId": {
+          "__rl": true,
+          "value": "mz5cN7DFI6PRXuEg",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/mz5cN7DFI6PRXuEg",
+          "cachedResultName": "SUB: Horoscope Bot Natal Tool with Telegram"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('date', ``, 'string') }}",
+            "time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('time', ``, 'string') }}",
+            "place": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('place', ``, 'string') }}",
+            "tz_offset": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('tz_offset', ``, 'string') }}",
+            "telegram_chat_id": "={{ $('Set').item.json.chat_id }}",
+            "telegram_bot_key": "7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o",
+            "latitude": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('latitude', ``, 'string') }}",
+            "longitude": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('longitude', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "place",
+              "displayName": "place",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "tz_offset",
+              "displayName": "tz_offset",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "telegram_chat_id",
+              "displayName": "telegram_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "telegram_bot_key",
+              "displayName": "telegram_bot_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "latitude",
+              "displayName": "latitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "longitude",
+              "displayName": "longitude",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        4688,
+        192
+      ],
+      "id": "d9fe7a4f-7393-4daf-b8c2-2db5e66c0802",
+      "name": "Natal_Chart_JSON"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get detailed forecast based on user request. Return markdowned response\npossibility to provide diffrent type of forecasts: dayly forecast, weekly forecast, natal cart interpretation, horary and synestry",
+        "workflowId": {
+          "__rl": true,
+          "value": "nufe3JjWmaXa8lcG",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nufe3JjWmaXa8lcG",
+          "cachedResultName": "SUB: Horoscope Writer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegram_chat_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telegram_chat_id', ``, 'number') }}",
+            "forecats_type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('forecats_type', ``, 'string') }}",
+            "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "telegram_chat_id",
+              "displayName": "telegram_chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "forecats_type",
+              "displayName": "forecats_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        4352,
+        192
+      ],
+      "id": "9d0250a5-86cc-46a3-b084-d88aa743a3a5",
+      "name": "Horoscope_Teller"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Today: {{ new Date().toLocaleDateString(\"ru-RU\", { day: 'numeric', month: 'long', year: 'numeric' }) }}\n\n{{ $('Set').item.json.user_message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ты профессиональный астрологический предсказатель.\n\nПользователь:\n- User_id/chat_id = {{ $json.user_id }}\n- User_Name: {{ $json.user_name }}\n- {{ $json.zodiac ? `Знак зодиака: ${$json.zodiac}` : 'Спроси у пользователя или знак зодиака, или дату рождения' }}\n- {{ $json.Level ? `Уровень подписки: ${$json.Level}` : 'Уровень подписки: Basic' }}\n- Birth date, time and place: {{ $json.birth_datetime_place }}\n- Общая информация: {{ $json.user_summary }}\n- Язык общения: {{ $json.language }}\n- Натальная карта: {{$json.Natal && $json.Natal.length > 30 ? \"есть\" : \"нет\"}}\n\nСтруктура в Airtable:  \n  - \"zodiac\": знак зодиака\n  - \"user_summary\": короткое описание пользователя, предпочтения, желания, детали  и чем интересуется которые получаешь из вопросов пользователя\n  - \"Birth DateTimePlace\": Дата, время и место рождения\n  - Language: язык общения с пользователем\n  - Frequency: статус пользователя, доступные значения: None, Weekly\n  - Level: Уровень подписки, доступные значения: Basic, Pro\n  - Natal: Расчитанная натальная карта пользователя\n\nДействия на команды :\n- /start приветсвуй пользователя и расскажи, что ты можешь. Предупреди, что информацию о знаке зодиака, дате рождения и наталльной карты будет сохранена. Что сохранено можно всегда посмотреть через команду \"/me\"\n- /me верни все что знаешь о пользователе\n- /natal расчитай натальную карту call Natal_Chart_JSON и дай ей детальную интерпритацию через сall Horoscope_Teller\n- /week дай недельный прогноз сall Horoscope_Teller\n- /day дай короткий прогноз на сегодняшний день\n\nДействия:\n- поддерживаешь разговор с пользователем\n- Если пользователь просто просит прогноз зная только знак зодиака, дай такой прогноз, но в конце предложи более продвинутый прогноз сделать по натальной карте\n- Для сохранения и обновления профиля (например, дату рождения, язык, общую информацию, натальную карту) call UserDataPersistence.update(\"field\", value).\n- Если пользователь вводит новую дату рождения: 1. Вычисли знак зодиака. 2.Вызови UserDataPersistence.update(\"zodiac\", zodiac_sign)\n- Прогноз даешь в зависимотси от уровня подписки пользователя: $json.Level. Если уровень не определен, переспроси.    \n- { $json.Level === 'Pro' ? 'Детальный на основе рассчитанной натальной карты' : 'Краткий прогноз на основе только знака зодиака, расчет домов и переходов не делаем' }}\n- Если пользователь попросил натальную карту проверь есть ли данные уже для расчета (дата,время и место рождения). Если данные есть - используй их, если нет - спроси дату, время и место рождения и сохрани call UserDataPersistence.set(field, value)\n- Испольовать call Natal_Chart_JSON для расчена если карты нет. В tool передавать дату в формате: %Y-%m-%d, время отдельно %H:%M, место рождения передеди на английский, tz_offset посчитай в зависимости от местоположения (integer в часах). После расчета всегда сохраняй натальную карту в профиле пользователя call UserDataPersistence.set(field, value)\n- Для прогноза на период, получение транзитов, аспектов, синастрии, хорарной карты call Horoscope_Teller tool. \n- для расчета synestry передай детали двух пользователей: даты, время и места рождения"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        4016,
+        -352
+      ],
+      "id": "faf4dd4b-b8f5-4520-a9c1-3be25784fcd5",
+      "name": "AI Coordinator"
+    },
+    {
+      "parameters": {
+        "path": "981e7d7e-1642-4b84-8ed5-1a3809efbd1a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1856,
+        -1120
+      ],
+      "id": "e6d4dd78-2107-47b2-ab8e-3fe179d605f7",
+      "name": "Webhook: CRON event",
+      "webhookId": "981e7d7e-1642-4b84-8ed5-1a3809efbd1a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $('Set').item.json.chat_id }},\n  \"text\": \"{{ $json.output.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n') }}\"\n  {{ $json.reply_markup ? `, \"reply_markup\": ${JSON.stringify($json.reply_markup)}` : \"\" }},\n  \"parse_mode\": \"Markdown\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4608,
+        -1184
+      ],
+      "id": "b1ada440-4adb-416c-8b88-5bd588a9941b",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $('Set').item.json.chat_id }},\n  \"text\": \"{{ $json.output.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n') }}\"\n  {{ $json.reply_markup ? `, \"reply_markup\": ${JSON.stringify($json.reply_markup)}` : \"\" }},\n  \"parse_mode\": \"Markdown\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4096,
+        -1456
+      ],
+      "id": "08d9b745-fd5a-47d8-a33c-7acfca1997e7",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62459d95-e0aa-4cbf-a8cb-2ffec979c2a1",
+              "name": "reply_markup",
+              "value": "={\n    \"inline_keyboard\": [\n      [\n        { \"text\": \"❓ Ask Question (Horary)\", \"callback_data\": \"forecast:horary\" }\n      ],\n      [\n        { \"text\": \"🌞 Horoscope — Day\", \"callback_data\": \"forecast:day\" }\n      ],\n      [\n        { \"text\": \"📆 Horoscope — Week\", \"callback_data\": \"forecast:week\" }\n      ],\n      [\n        { \"text\": \"💞 Synastry\", \"callback_data\": \"forecast:synastry\" }\n      ],\n      [\n        { \"text\": \"🤝 Synastry Accepted\", \"callback_data\": \"forecast:synastry_accepted\" }\n      ],\n      [\n        { \"text\": \"🪐 Natal chart\", \"callback_data\": \"forecast:natal\" }\n      ]\n    ]\n}",
+              "type": "string"
+            },
+            {
+              "id": "042b1ec2-9355-4a12-83bc-d4d569edd4a7",
+              "name": "output",
+              "value": "=📦 *Select horoscop type to receive*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4080,
+        -1056
+      ],
+      "id": "4ab6c334-8a2b-4f44-9cb4-5cec2a70dbbb",
+      "name": "Set Inline Buttons: Forecasts Special"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f45f27cd-f2b8-4f6e-9308-79d2214d8905",
+              "name": "message.from.id",
+              "value": "={{ $json.callback_query.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "01352242-ddf6-41f1-a38d-3e2e3b538831",
+              "name": "message.text",
+              "value": "=/{{ ($json.callback_query?.data ?? '').replace(/^forecast:/, '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        224
+      ],
+      "id": "cfcc7108-4689-4223-83b6-6a99ef74b5ec",
+      "name": "Message Forecast Name"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62459d95-e0aa-4cbf-a8cb-2ffec979c2a1",
+              "name": "reply_markup",
+              "value": "={\n  \"inline_keyboard\": [\n    [\n      {\n        \"text\": \"🚫 Без уведомлений {{ $('GetUserData').item.json.Frequency === 'None' ? ' ✅' : '' }}\",\n        \"callback_data\": \"send:None\"\n      },\n      {\n        \"text\": \"📅 Раз в неделю{{ $('GetUserData').item.json.Frequency === 'Weekly' ? ' ✅' : '' }}\",\n        \"callback_data\": \"send:Weekly\"\n      }\n    ]\n  ]\n}",
+              "type": "string"
+            },
+            {
+              "id": "56935b13-56ba-40d6-9bd0-fae3333e2521",
+              "name": "output",
+              "value": "=📨 *How often you receive messages from me?*",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4864,
+        -1040
+      ],
+      "id": "7ceedbb8-1bc1-4e48-9559-6970a241f9c8",
+      "name": "Set Inline Buttons: Frequency"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1FskfNCn4p9CkZ",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "user id": "={{ String($json.callback_query.from.id) }}",
+            "Frequency": "={{ ($json.callback_query?.data ?? '').replace(/^send:/, '') }}"
+          },
+          "matchingColumns": [
+            "user id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "user id",
+              "displayName": "user id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "zodiac",
+              "displayName": "zodiac",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "user_summary",
+              "displayName": "user_summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Frequency",
+              "displayName": "Frequency",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Language",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Natal Chart",
+              "displayName": "Natal Chart",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Level",
+              "displayName": "Level",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        1712
+      ],
+      "id": "d8e5cab4-fbf1-402d-afb6-aa6a86fe0a9d",
+      "name": "Set Frequency to NONE/Weekly",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f45f27cd-f2b8-4f6e-9308-79d2214d8905",
+              "name": "message.from.id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "01352242-ddf6-41f1-a38d-3e2e3b538831",
+              "name": "message.text",
+              "value": "=/week",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -1120
+      ],
+      "id": "82219b75-2ab4-45b5-9f6c-a1c9b3750b4f",
+      "name": "Ask Weekly Forecast"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62459d95-e0aa-4cbf-a8cb-2ffec979c2a1",
+              "name": "reply_markup",
+              "value": "={\n  \"inline_keyboard\": [\n    [\n            {\n  \"text\": \"📤 Отправить контактам\",\n  \"url\": \"https://t.me/share/url?url={{ encodeURIComponent(`https://t.me/vicy_horoscope_bot?start=${$('Create Invite record').item.json.id}`) }}&text={{ encodeURIComponent('🌟 Присоединяйся к гороскоп-боту! 🔮 Получи свой прогноз и карту совместимости 👇') }}\"\n}\n    ],\n    [\n      { \"text\": \"📊 Мои приглашения\", \"callback_data\": \"invite:stats\" }\n    ],\n    [\n      { \"text\": \"🧭 Как это работает\", \"callback_data\": \"invite:how\" }\n    ]\n  ]\n}",
+              "type": "string"
+            },
+            {
+              "id": "042b1ec2-9355-4a12-83bc-d4d569edd4a7",
+              "name": "output",
+              "value": "=   Пригласите друга — получите бесплатную карту совместимости для вас обоих\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4352,
+        -784
+      ],
+      "id": "73a2f152-0c4e-4fcd-82a5-81c2ed50fd5c",
+      "name": "Invite friend message"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblT1TV3XAadSTCWj",
+          "mode": "list",
+          "cachedResultName": "Invites",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tblT1TV3XAadSTCWj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "In progress",
+            "user id": "={{ $('Set').item.json.chat_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "user id",
+              "displayName": "user id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        4064,
+        -800
+      ],
+      "id": "c82a702b-a18b-4818-94b4-29925e7adac3",
+      "name": "Create Invite record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51f9c8aa-6f10-4175-9428-7a302e253c3e",
+              "leftValue": "={{ ($json.message.text ?? '').slice(0,6).toLowerCase()}}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5d3970f4-5738-4c14-9713-fb1d4e72310c",
+              "leftValue": "={{ (String($json.message?.text ?? '')).replace(/^\\/start\\s*/, '') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1216,
+        -240
+      ],
+      "id": "1efd5371-943d-4b17-8ffb-a607c3f48070",
+      "name": "If Invited user"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblT1TV3XAadSTCWj",
+          "mode": "list",
+          "cachedResultName": "Invites",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tblT1TV3XAadSTCWj"
+        },
+        "filterByFormula": "={{\n  (function () {\n    const rec = (String($json.message?.text ?? '').match(/\\brec[0-9A-Za-z]{14}\\b/) || [])[0];\n    return rec ? `RECORD_ID() = '${rec}'` : 'FALSE()';\n  })()\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -992,
+        -704
+      ],
+      "id": "7ceaba86-26bf-4edf-bf09-3a7f18ab8316",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "91c97962-4ce3-4c22-a4f6-ef1410891fe7",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.chat.id.toString() }}",
+              "rightValue": "={{ $json['user id']}}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        -704
+      ],
+      "id": "ba0f94b1-e377-41c2-94ae-3d258ba9fe5d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblT1TV3XAadSTCWj",
+          "mode": "list",
+          "cachedResultName": "Invites",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tblT1TV3XAadSTCWj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "Status": "Done",
+            "invited_user_id": "={{ $('Telegram Trigger').item.json.message.chat.id.toString() }}",
+            "user id": "={{ $json['user id'] }}",
+            "invited_user_name": "={{ $('Telegram Trigger').item.json.message.username }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "user id",
+              "displayName": "user id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Calculation",
+              "displayName": "Calculation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "invited_user_id",
+              "displayName": "invited_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "invited_user_name",
+              "displayName": "invited_user_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -592,
+        -656
+      ],
+      "id": "7135c508-20b2-41c5-9cdb-83c156dfe7bc",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblHskfK8NQkC1kQx",
+          "mode": "list",
+          "cachedResultName": "Sinestry",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tblHskfK8NQkC1kQx"
+        },
+        "filterByFormula": "={{\n  `AND({user id} = ${JSON.stringify(String($json.callback_query?.from?.id ?? ''))}, {Status} = \"Active\")`\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        832
+      ],
+      "id": "95ec98b6-3b81-48be-ae3e-0bec874efec1",
+      "name": "Search Invites",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Telegram message: single-line text + inline buttons with callback_data\n// Button text: \"/synestry user_id invited_user_id\"\n// callback_data: \"synestry|user_id|invited_user_id\"\n\nconst items = $input.all();\n\nconst kb = [];\nfor (const { json } of items) {\n  const rec = json.fields ?? json;\n\n  const userId = String(rec['user id'] ?? rec.user_id ?? '').trim();\n  const acceptedUserId = String(rec['accepted user id'] ?? rec.invited_user_id ?? '').trim();\n  const acceptedUserName = String(rec['accepted user name'] ?? rec.invited_user_name ?? '').trim();\n  if (!userId || !acceptedUserId) continue;\n\n  const btnText = `/synestry ${acceptedUserName}`;\n  const data = `synestry:${invitedUserId}`;\n\n  // одна кнопка в строке\n  kb.push([{ text: btnText, callback_data: data }]);\n}\n\n// одна строка текста\nconst text =\n  kb.length > 0\n    ? 'Доступные Synestry:'\n    : 'Нет подтверждённых пар.';\n\nreturn [\n  {\n    json: {\n      text,\n      parse_mode: 'Markdown',\n      reply_markup: { inline_keyboard: kb },\n      total: kb.length,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        832
+      ],
+      "id": "2ebe0cec-c60d-4159-ae67-50d39d8f8310",
+      "name": "Collect Unlocked Synestry by Invites"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot7788370615:AAGHF9joHcbRxG_LoHqSa8HymXG4LpgsJ-o/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $('Telegram Trigger').item.json.callback_query.from.id }},\n  \"text\": \"{{  $json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n') }}\"\n  {{ $json.reply_markup ? `, \"reply_markup\": ${JSON.stringify($json.reply_markup)}` : \"\" }},\n  \"parse_mode\": \"Markdown\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        832
+      ],
+      "id": "cb197f56-b5c0-4ecc-9a70-f6fead1c4f61",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f45f27cd-f2b8-4f6e-9308-79d2214d8905",
+              "name": "message.from.id",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "01352242-ddf6-41f1-a38d-3e2e3b538831",
+              "name": "message.text",
+              "value": "=посчитай synestry для меня и пользователя {{ $json.user_name }} ({{ $json['Birth DateTimePlace'] }})",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        464
+      ],
+      "id": "5df98e7f-242e-4514-8e15-e2b434168ec7",
+      "name": "Message Synestry Calculation"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1FskfNCn4p9CkZ",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ"
+        },
+        "filterByFormula": "={user id} = {{ ($json.callback_query?.data ?? '').replace(/^synestry:/, '') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        512
+      ],
+      "id": "31f83eb2-a0a9-45e2-b320-4ff3460c8d64",
+      "name": "Search Second User Details",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node\nconst items = $input.all();\nconst kb = [];\n\nfor (const { json } of items) {\n  const rec = json.fields ?? json;\n  const acceptedUserId = String(rec['accepted user id'] ?? rec.invited_user_id ?? '').trim();\n  const acceptedUserName = String(rec['accepted user name'] ?? rec.invited_user_name ?? '').trim();\n\n  const btnText = `/synestry ${acceptedUserName}`;\n  const data = `synestry:${acceptedUserId}`;\n  kb.push([{ text: btnText, callback_data: data }]);\n}\n\nconst text = kb.length > 0 ? 'Доступные Synestry:' : 'Нет подтверждённых пар.';\n\n// забираем chat_id из узла Set без привязки к pair\nconst chatId = $item(0).$node['Set'].json.chat_id;\n\nreturn [{\n  json: {\n    chat_id: chatId,\n    text,\n    parse_mode: 'Markdown',\n    reply_markup: { inline_keyboard: kb },\n    total: kb.length,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4304,
+        -576
+      ],
+      "id": "44cf12a0-0400-4014-ada2-d1839642f01e",
+      "name": "Collect Unlocked Synestry by Invites1"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblHskfK8NQkC1kQx",
+          "mode": "list",
+          "cachedResultName": "Sinestry",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tblHskfK8NQkC1kQx"
+        },
+        "filterByFormula": "={{\n  `AND({user id} = ${JSON.stringify(String($('Set').item.json.chat_id ?? ''))}, {Status} = \"Active\")`\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3968,
+        -576
+      ],
+      "id": "36914841-a2f5-4d81-a8dc-0175bc154c7d",
+      "name": "Search Accepted Synestries",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62459d95-e0aa-4cbf-a8cb-2ffec979c2a1",
+              "name": "reply_markup",
+              "value": "={{ $json.reply_markup ? JSON.stringify($json.reply_markup) : \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "042b1ec2-9355-4a12-83bc-d4d569edd4a7",
+              "name": "output",
+              "value": "=Твой список доступных синестрий от зарегистрированных пользователей",
+              "type": "string"
+            },
+            {
+              "id": "c3727512-e203-465f-bedd-bd07fa64292a",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4592,
+        -576
+      ],
+      "id": "692d241f-cb3a-4646-afec-9df7b3b69a41",
+      "name": "Create List Accepted Synesties"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "users",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "frequency",
+              "condition": "eq",
+              "keyValue": "Weekly"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        -1120
+      ],
+      "id": "c9a5e56e-25ca-499b-b41c-2fb7b80d8df2",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get current user details agaiable persisted in Database",
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('Switch').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        3824,
+        160
+      ],
+      "id": "70252882-2969-4db0-8abc-2a91f006a708",
+      "name": "Get User Details",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update user details is something new found",
+        "operation": "update",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Switch').item.json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "zodiac",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues0_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "user_summary",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "frequency",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "language",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "natal",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues4_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "birth_datetime_place",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        4000,
+        160
+      ],
+      "id": "8ccd4b80-0a9c-4f7a-8724-2a102f890c03",
+      "name": "Update Existing User Details",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update user details is something new found",
+        "operation": "update",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Switch').item.json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Switch').item.json.user_id }}"
+            },
+            {
+              "fieldId": "user_name",
+              "fieldValue": "={{ $('Telegram Trigger').item.json.message.from.username }}"
+            },
+            {
+              "fieldId": "zodiac",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "user_summary",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "language",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues4_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "natal",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues5_Field_Value', ``, 'string') }}"
+            },
+            {
+              "fieldId": "birth_datetime_place",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues6_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        4160,
+        176
+      ],
+      "id": "850c507f-5aa8-4b80-b09e-1a72df547536",
+      "name": "Create User Details Record",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.chat_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        -608
+      ],
+      "id": "aa3d48b3-2ff4-4eaf-afa4-c1c3be6a88bd",
+      "name": "GetUserData",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1FskfNCn4p9CkZ",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Level": "={{ ($json.callback_query?.data ?? '').replace(/^subscription:/, '') }}",
+            "user id": "={{ String($json.callback_query.from.id) }}"
+          },
+          "matchingColumns": [
+            "user id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "user id",
+              "displayName": "user id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "zodiac",
+              "displayName": "zodiac",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "user_summary",
+              "displayName": "user_summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Frequency",
+              "displayName": "Frequency",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Language",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Natal Chart",
+              "displayName": "Natal Chart",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Level",
+              "displayName": "Level",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        1296
+      ],
+      "id": "e44ba680-cee6-4f58-939f-a99f1617e5d4",
+      "name": "_bak_Set Subscription Basic/PRO",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "users",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ String($json.callback_query.from.id) }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "level",
+              "fieldValue": "={{ ($json.callback_query?.data ?? '').replace(/^subscription:/, '') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        1120
+      ],
+      "id": "c5f4a6cb-d79d-4de2-9150-2cd98b6940c7",
+      "name": "Set Subscription Basic/PRO",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "users",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ String($json.callback_query.from.id) }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "frequency",
+              "fieldValue": "={{ ($json.callback_query?.data ?? '').replace(/^send:/, '') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1520
+      ],
+      "id": "5a197b52-13be-417f-9175-aeb7cc9fb806",
+      "name": "Set Subscription Basic/PRO1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app0dIJnWQrRudQ5B",
+          "mode": "list",
+          "cachedResultName": "Horoscope",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1FskfNCn4p9CkZ",
+          "mode": "list",
+          "cachedResultName": "Users",
+          "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ"
+        },
+        "filterByFormula": "={user id}={{ $('Telegram Trigger').item.json.callback_query.from.id }}",
+        "returnAll": false,
+        "options": {
+          "view": {
+            "__rl": true,
+            "value": "viw4IcgVmuuUxum5s",
+            "mode": "list",
+            "cachedResultName": "All Data",
+            "cachedResultUrl": "https://airtable.com/app0dIJnWQrRudQ5B/tbl1FskfNCn4p9CkZ/viw4IcgVmuuUxum5s"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1920,
+        1232
+      ],
+      "id": "02e36695-79bd-4353-9f31-283d02b9f1a7",
+      "name": "_bak_GetUserSavedData",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HEXGUOjEKZg9bOka",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('Telegram Trigger').item.json.callback_query.from.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        1104
+      ],
+      "id": "e973e630-59f2-43e6-8984-cafe3344ff6d",
+      "name": "GetUserSavedData",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "ac49f271-5ec5-477f-a678-3c70cfb13957",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1872,
+        -1440
+      ],
+      "id": "43fdb64a-a048-4963-8b6e-389bf5ffbbb9",
+      "name": "Daily Horoscope",
+      "webhookId": "ac49f271-5ec5-477f-a678-3c70cfb13957"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "users",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "frequency",
+              "condition": "eq",
+              "keyValue": "Weekly"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        -1440
+      ],
+      "id": "b8ce7d7f-ac1a-49bc-83be-48aa3603b0ab",
+      "name": "Get Daily",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ex8hgYPZBm1zYLA5",
+          "name": "Supabase Horoscope account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f45f27cd-f2b8-4f6e-9308-79d2214d8905",
+              "name": "message.from.id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "01352242-ddf6-41f1-a38d-3e2e3b538831",
+              "name": "message.text",
+              "value": "=/day",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -1440
+      ],
+      "id": "a766f3b1-dc42-4c1b-8b0b-f57104d1ac53",
+      "name": "Ask Daily Forecast"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ac26f86b-d028-4b69-a508-bfd47202bf91",
+              "leftValue": "={{ $json.user_name }}",
+              "rightValue": "Vicy_007",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -944,
+        -1440
+      ],
+      "id": "aee67952-74a7-4248-bc91-999ce44e24fb",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=HoroscopeBot:{{ $('Set').item.json.chat_id }}",
+        "tableName": "HoroscopeBot",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3648,
+        128
+      ],
+      "id": "3b780caa-b1d1-47fd-be72-b2a66941065f",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "8iz2ufyFBs1m6it8",
+          "name": "Postgres PGVector"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook: CRON event": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      }
+    ],
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 610349104,
+          "callback_query": {
+            "id": "4809600202406210645",
+            "from": {
+              "id": 1119822310,
+              "is_bot": false,
+              "first_name": "Viktor",
+              "last_name": "J.",
+              "username": "Vicy_007",
+              "language_code": "en"
+            },
+            "message": {
+              "message_id": 1631,
+              "from": {
+                "id": 7788370615,
+                "is_bot": true,
+                "first_name": "Horoscope Teller",
+                "username": "vicy_horoscope_bot"
+              },
+              "chat": {
+                "id": 1119822310,
+                "first_name": "Viktor",
+                "last_name": "J.",
+                "username": "Vicy_007",
+                "type": "private"
+              },
+              "date": 1764533716,
+              "text": "📨 *How often you receive messages from me?*",
+              "reply_markup": {
+                "inline_keyboard": [
+                  [
+                    {
+                      "text": "🚫 Без уведомлений ",
+                      "callback_data": "send:None"
+                    },
+                    {
+                      "text": "📅 Раз в неделю",
+                      "callback_data": "send:Weekly"
+                    }
+                  ]
+                ]
+              }
+            },
+            "chat_instance": "2211627384040482231",
+            "data": "send:None"
+          }
+        }
+      }
+    ],
+    "Daily Horoscope": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "GetUserData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send Profile Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Inline Buttons: Forecasts Special",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Invite record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search Accepted Synestries",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Inline Buttons: Subscription": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Message": {
+      "main": [
+        [
+          {
+            "node": "If Invited user",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Command": {
+      "main": [
+        [
+          {
+            "node": "Message Forecast Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search Second User Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Set Subscription Basic/PRO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Subscription Basic/PRO1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Response to Query Comment": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Send Confirmation details": {
+      "main": [
+        [
+          {
+            "node": "HTTP Response to Query Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Profile Info": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Natal_Chart_JSON": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Horoscope_Teller": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Coordinator": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: CRON event": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Set Inline Buttons: Frequency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Set Inline Buttons: Subscription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Inline Buttons: Forecasts Special": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Forecast Name": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Inline Buttons: Frequency": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Frequency to NONE/Weekly": {
+      "main": [
+        []
+      ]
+    },
+    "Ask Weekly Forecast": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invite friend message": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Invite record": {
+      "main": [
+        [
+          {
+            "node": "Invite friend message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Invited user": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update record": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Invites": {
+      "main": [
+        [
+          {
+            "node": "Collect Unlocked Synestry by Invites",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Unlocked Synestry by Invites": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Synestry Calculation": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Second User Details": {
+      "main": [
+        [
+          {
+            "node": "Message Synestry Calculation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Accepted Synestries": {
+      "main": [
+        [
+          {
+            "node": "Collect Unlocked Synestry by Invites1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Unlocked Synestry by Invites1": {
+      "main": [
+        [
+          {
+            "node": "Create List Accepted Synesties",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create List Accepted Synesties": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Ask Weekly Forecast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Details": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Existing User Details": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create User Details Record": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetUserData": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "_bak_Set Subscription Basic/PRO": {
+      "main": [
+        []
+      ]
+    },
+    "Set Subscription Basic/PRO": {
+      "main": [
+        [
+          {
+            "node": "GetUserSavedData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Subscription Basic/PRO1": {
+      "main": [
+        [
+          {
+            "node": "GetUserSavedData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "_bak_GetUserSavedData": {
+      "main": [
+        []
+      ]
+    },
+    "GetUserSavedData": {
+      "main": [
+        [
+          {
+            "node": "HTTP Send Confirmation details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Horoscope": {
+      "main": [
+        [
+          {
+            "node": "Get Daily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Daily": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Ask Daily Forecast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask Daily Forecast": {
+      "main": [
+        []
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Coordinator",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3c51f2f2-6791-49e1-863e-b24d90db39a3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4af5e9ebbe5297a00876edb3cd77d4f4f46fc27bdc8aed3a953e8df9a3e5db33"
+  },
+  "id": "uTJCyx8aSssJiVge",
+  "tags": [
+    {
+      "updatedAt": "2025-04-30T20:37:24.352Z",
+      "createdAt": "2025-04-30T20:37:24.352Z",
+      "id": "uJw9hpY4KUg7tdMW",
+      "name": "StartUp"
+    }
+  ]
+}
